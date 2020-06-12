@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import { connectToDatabase } from "./db";
 
 const BuildRSSTemplate = (items: RSSItem[]) => {
-  return `<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  return `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
       <channel>
+          <atom:link href="https://rss-downloader.now.sh/rss" rel="self" type="application/rss+xml" />
           <title>Guilherme's Torrents</title>
           <description>:D</description>
-          <link>http://rarbg.com</link>
+          <link>https://rss-downloader.now.sh/rss</link>
           <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
           <copyright>(c) 2020 </copyright>
           ${items.map((item) => BuildRSSItem(item)).join("\t\n")}
@@ -16,12 +17,13 @@ const BuildRSSTemplate = (items: RSSItem[]) => {
 
 const BuildRSSItem = (data: RSSItem) => {
   const { name, link, _id: id, dateAdded: pubDate } = data;
+
   return `
   <item>
       <title>${name}</title>
       <description>${name}</description>
-      <link>${link}</link>
-      <guid>${id}</guid>
+      <link><![CDATA[${link}]]></link>
+      <guid isPermaLink="false">${id}</guid>
       <pubDate>${pubDate.toUTCString()}</pubDate>
   </item>`;
 };
