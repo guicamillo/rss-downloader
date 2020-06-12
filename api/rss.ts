@@ -7,7 +7,7 @@ const BuildRSSTemplate = (items: RSSItem[]) => {
           <title>Guilherme's Torrents</title>
           <description>:D</description>
           <link>http://rarbg.com</link>
-          <lastBuildDate>${new Date().toISOString()}</lastBuildDate>
+          <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
           <copyright>(c) 2020 </copyright>
           ${items.map((item) => BuildRSSItem(item)).join("\t\n")}
       </channel>
@@ -22,7 +22,7 @@ const BuildRSSItem = (data: RSSItem) => {
       <description>${name}</description>
       <link>${link}</link>
       <guid>${id}</guid>
-      <pubDate>${pubDate.toISOString()}</pubDate>
+      <pubDate>${pubDate.toUTCString()}</pubDate>
   </item>`;
 };
 
@@ -40,7 +40,7 @@ async function rss(req: Request, res: Response) {
   );
   const torrents = await collection.find({}).sort({ dateAdded: -1 }).toArray();
 
-  res.status(200).send(BuildRSSTemplate(torrents));
+  res.status(200).type("text/xml").send(BuildRSSTemplate(torrents));
 }
 
 export { rss as default, BuildRSSTemplate, BuildRSSItem };
