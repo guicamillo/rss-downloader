@@ -18,13 +18,13 @@ async function add(req: Request, res: Response) {
 
   const status = await collection.insertOne({
     name,
-    link,
+    link: decodeURIComponent(link as string),
     dateAdded: new Date(),
   });
 
   res.status(200).json({
     status: "SUCCESS",
-    description: `Just added ${name} & ${link}`,
+    description: `Just added ${name} & ${decodeURIComponent(link as string)}`,
   });
 }
 
