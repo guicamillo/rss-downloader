@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { connectToDatabase } from "./db";
 
 async function add(req: Request, res: Response) {
-  const { name, link } = req.query;
+  const { name, link, type } = req.query;
   if (!name || !link) {
     res.status(500).json({
       status: "API_ERROR",
@@ -20,6 +20,7 @@ async function add(req: Request, res: Response) {
     name,
     link: decodeURIComponent(link as string),
     dateAdded: new Date(),
+    type,
   });
 
   res.status(200).json({

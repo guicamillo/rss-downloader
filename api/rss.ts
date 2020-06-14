@@ -16,7 +16,7 @@ const BuildRSSTemplate = (items: RSSItem[]) => {
 };
 
 const BuildRSSItem = (data: RSSItem) => {
-  const { name, link, _id: id, dateAdded: pubDate } = data;
+  const { name, link, _id: id, dateAdded: pubDate, type } = data;
 
   return `
   <item>
@@ -24,6 +24,7 @@ const BuildRSSItem = (data: RSSItem) => {
       <description>${name}</description>
       <link><![CDATA[${link}]]></link>
       <guid isPermaLink="false">${id}</guid>
+      ${type ? `<category>${type}</category>` : null}
       <pubDate>${pubDate.toUTCString()}</pubDate>
   </item>`;
 };
@@ -31,16 +32,22 @@ const BuildRSSItem = (data: RSSItem) => {
 interface RSSItem {
   name: string;
   link: string;
+  type: string;
   dateAdded: Date;
   _id: string;
 }
 
 async function rss(req: Request, res: Response) {
+  const { type = null } = req.query;
+
   const db = await connectToDatabase(process.env.MONGODB_URI as string);
   const collection = await db.collection(
     process.env.MONGO_DB_COLLECTION as string
   );
-  const torrents = await collection.find({}).sort({ dateAdded: -1 }).toArray();
+  const torrents = await collection
+    .find(type ? { type } : {})
+    .sort({ dateAdded: -1 })
+    .toArray();
 
   res.status(200).type("text/xml").send(BuildRSSTemplate(torrents));
 }
